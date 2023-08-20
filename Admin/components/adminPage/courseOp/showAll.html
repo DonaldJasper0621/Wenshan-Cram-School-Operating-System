@@ -1,0 +1,44 @@
+<br>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Class Id</th>
+      <th scope="col">Class Name</th>
+      <th scope="col">Teacher id</th>
+      <th scope="col">Teacher Nme</th>
+      <th scope="col">Start At</th>
+      <th scope="col">End At</th>
+      <th scope="col">Open At</th>
+      <th scope="col">Fee</th>
+    </tr>
+  </thead>
+  <tbody id="showAllClass">
+  </tbody>
+</table>
+
+<script>
+  console.log(localStorage)
+  console.log(Global.url)
+  fetch(Global.url+"/admin/allClasses", {headers: {Authorization: 'Bearer '+localStorage.getItem('token')},method: 'GET'}).then(async(res)=>{
+    showData = await res.json();
+    let innerhtml = "";
+
+    showData.forEach((showData)=>{
+      const date = new Date(Date.parse(showData.OpenTime))
+      innerhtml += `<tr>
+        <th scope="row">${showData.Clsid}</th>
+        <td>${showData.ClassName}</td>
+        <td>${showData.Tid}</td>
+        <td>${showData.Name}</td>
+        <td>${showData.StartAt}</td>
+        <td>${showData.EndAt}</td>
+        <td>${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}</td>
+        <td>${showData.Fee}</td>
+      </tr>`
+    })
+    console.log(innerhtml)
+
+    $('#showAllClass').html(innerhtml)
+  })
+
+</script>

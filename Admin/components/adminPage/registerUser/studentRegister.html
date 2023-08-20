@@ -1,0 +1,43 @@
+<form class="registerForm" id="studentRegisterForm">
+  <div class="reminder">
+    <h3>Student Register Form</h3>
+  </div>
+  <p class="message" style="color: red"></p>
+  <div class="mb-3">
+    <label for="stuAccount" class="form-label">Account:</label>
+    <input type="account" name="Account" class="form-control" id="stuAccount">
+  </div>
+  <div class="mb-3">
+    <label for="stuPassword" class="form-label">Password:</label>
+    <input type="password" name="Pass" class="form-control" id="stuPassword" required>
+  </div>
+  <div class="mb-3">
+    <label for="stuName" class="form-label">Name:</label>
+    <input type="text" name="Name" class="form-control" id="stuName">
+  </div>
+  <div class="mb-3">
+    <label for="stuPhone" class="form-label">Phone:</label>
+    <input type="text" name="phone" class="form-control" id="stuPhone">
+  </div>
+  <div class="mb-3">
+    <label for="stuBirth" class="form-label">Birthday</label>
+    <input type="date" name="Birthday" class="form-control" id="stuBirth">
+  </div>
+  <button id="registerBtnStu" class="btn btn-primary" bg-info>Submit</button>
+</form>
+<script>
+  // Register a Student
+  $("#registerBtnStu").click(function(e) {
+    e.preventDefault();
+    // 如果password為空就不能提交
+    if(!checkForm("studentRegisterForm")){
+      $('.message').text("Password and Account Cannot be Null.")
+    }else{
+      dealForm('POST' ,Global.url+"/admin/delstudent", "studentRegisterForm", true);
+      $(':input','#studentRegisterForm').not(':button, :submit, :reset, :hidden')
+      .val('')
+      .prop('checked', false)
+      .prop('selected', false);
+    }
+  })
+</script>

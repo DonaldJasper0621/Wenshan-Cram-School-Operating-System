@@ -1,0 +1,38 @@
+<form class="registerForm" id="trRegisterForm">
+  <div class="reminder">
+    <h3>Teacher Register Form</h3>
+  </div>
+  <p class="message" style="color: red"></p>
+  <div class="mb-3">
+    <label for="trAccount" class="form-label">Account:</label>
+    <input type="account" name="Account" class="form-control" id="trAccount">
+  </div>
+  <div class="mb-3">
+    <label for="trPassword" class="form-label">Password:</label>
+    <input type="password" name="Pass" class="form-control" id="trPassword" required>
+  </div>
+  <div class="mb-3">
+    <label for="trName" class="form-label">Name:</label>
+    <input type="text" name="Name" class="form-control" id="trName">
+  </div>
+  <div class="mb-3">
+    <label for="trPhone" class="form-label">Phone:</label>
+    <input type="text" name="Phone" class="form-control" id="trPhone">
+  </div>
+  <button type="submit" id="registerBtnTr" class="btn btn-primary" bg-info>Submit</button>
+</form>
+<script>
+  // Register a Teacher
+  $("#registerBtnTr").click(function(e) {
+    e.preventDefault();
+    if(!checkForm('trRegisterForm')){
+      $('.message').text("Password and Account Cannot be Null.")
+    }else{
+      dealForm('POST', Global.url+"/admin/teacher", "trRegisterForm", true);
+      $(':input','#trRegisterForm').not(':button, :submit, :reset, :hidden')
+      .val('')
+      .prop('checked', false)
+      .prop('selected', false);
+    }
+  })
+</script>

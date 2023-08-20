@@ -1,0 +1,69 @@
+<div class="mb-3" style="display:flex; height: 6vh;">
+  <label for="classIdForStu" class="form-label" style="display: inline-block">課程 ID:</label>
+  <select class="form-select" aria-label="Default select example" id="selectClassStu">
+    <option selected id="classIdForStu">Open this select menu</option>
+  </select>
+</div>
+
+<div class="mb-3 row" style="display:flex; height: 6vh;">
+  <label for="dateCondStu" class="col-sm-4 form-label" >考試日期<span style="color: red">(僅供查詢使用):</span></label>
+  <div class="col-sm-7">
+    <input type="date" name="dateCondStu" class="form-control" id="dateCondStu">
+  </div>
+</div>
+
+<button type="submit" class="btn btn-outline-primary" style="white-space:nowrap;" id="SearchForGradeBtn">查詢</button>
+<div>
+  <table id="attentanceTableStu" class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">課程名稱</th>
+        <th scope="col">考試類別</th>
+        <th scope="col">學號</th>
+        <th scope="col">學生姓名</th>
+        <th scope="col">考試時間</th>
+        <th scope="col">分數</th>
+      </tr>
+    </thead>
+    <tbody id="gradeBodyStu">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  fetch(Global.url+`/stu/studyClasses/${localStorage.getItem('Userid')}`,{
+    headers: {Authorization: 'Bearer '+localStorage.getItem('token')}, 
+    method: 'GET'
+  }).then(async (res) => {
+    const classes = await res.json()
+    console.log(classes)
+    classes.forEach(data => {
+      $('#selectClassStu').append(`<option value=${data.Clsid}>${data.Clsid} ${data.ClassName}</option>`)
+    });
+    $('#SearchForGradeBtn').on('click',(e) => {
+      fetch(Global.url+`/stu/grade?stuid=${localStorage.getItem('Userid')}&clsid=${Number.parseInt($('option:selected').val())}&date=${$('#dateCondStu').val()}`, 
+      {
+        headers: {Authorization: 'Bearer '+localStorage.getItem('token'), 'content-type': 'application/json'},
+        method: 'GET'
+      }).then(async(res) => {
+        const grades = await res.json()
+        console.log(grades)
+        let htmlString = ''
+        grades.forEach((data) => {
+          htmlString += `<tr>
+            <th scope="row">${data.ClassName}</th>
+            <td>${data.Description}</td>
+            <td>${data.Stuid}</td>
+            <td>${data.Name}</td>
+            <td>${data.TestDate}</td>
+            <td>${data.Score}</td>
+          </tr>`
+        })
+        $('#gradeBodyStu').html(htmlString);
+      })
+      // console.log(htmlString)
+      // console.log("click")
+    })
+
+  })
+</script>

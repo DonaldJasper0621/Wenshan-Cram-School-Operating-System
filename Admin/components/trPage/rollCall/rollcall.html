@@ -1,0 +1,290 @@
+<div class="mb-3" style="display: flex; height: 6vh">
+  <label for="classIdForTr" class="form-label" style="display: inline-block"
+    >課程 ID:</label
+  >
+  <select
+    class="form-select"
+    aria-label="Default select example"
+    id="selectClass"
+  >
+    <option selected id="classIdForTr">Open this select menu</option>
+  </select>
+</div>
+
+<div class="mb-3 row" style="display: flex; height: 6vh">
+  <label for="testDate" class="col-sm-4 form-label"
+    >點名日期<span style="color: red">(僅供查詢使用):</span></label
+  >
+  <div class="col-sm-7">
+    <input type="date" name="testDate" class="form-control" id="testDate" />
+  </div>
+</div>
+<br />
+<div>
+  <button
+    type="submit"
+    class="btn btn-outline-primary"
+    style="white-space: nowrap"
+    id="onClassCallBtn"
+  >
+    上課點名
+  </button>
+  <button
+    type="submit"
+    class="btn btn-outline-primary"
+    style="white-space: nowrap"
+    id="leftClassCallBtn"
+  >
+    下課點名
+  </button>
+  <button
+    type="submit"
+    class="btn btn-outline-primary"
+    style="white-space: nowrap"
+    id="SearchForAttBtn"
+  >
+    查詢
+  </button>
+</div>
+<br />
+<div>
+  <table id="rollcallTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">點名 ID</th>
+        <th scope="col">課程 ID</th>
+        <th scope="col">點名類型</th>
+        <th scope="col">點名 IP</th>
+        <th scope="col">點名時間</th>
+        <th scope="col">暫停點名</th>
+        <th scope="col">重啟點名</th>
+      </tr>
+    </thead>
+    <tbody id="rollcallBody"></tbody>
+  </table>
+
+  <table id="attentanceTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">課程名稱</th>
+        <th scope="col">點名類別</th>
+        <th scope="col">學號</th>
+        <th scope="col">學生姓名</th>
+        <th scope="col">點名時間</th>
+        <th scope="col">回應時間</th>
+        <th scope="col">點名IP</th>
+        <th scope="col">回應IP</th>
+        <th scope="col">點名狀態</th>
+      </tr>
+    </thead>
+    <tbody id="attentanceBody"></tbody>
+  </table>
+</div>
+
+<script>
+  function rollcall() {
+    $("#attentanceTable").attr("hidden", true);
+    // 設定options
+    $("#classIdForTr").text(
+      localStorage.getItem("classId") + " " + localStorage.getItem("className")
+    );
+    $("#classIdForTr").val(localStorage.getItem("classId"));
+    let courseArr = JSON.parse(localStorage.getItem("classArr"));
+    courseArr.forEach((course) => {
+      $("#selectClass").append(
+        `<option value=${course.Clsid}>${course.Clsid} ${course.ClassName}</option>`
+      );
+    });
+
+    // 上課點名function
+    $("#onClassCallBtn").on("click", () => {
+      $("#rollcallTable").attr("hidden", false);
+      $("#attentanceTable").attr("hidden", true);
+      const rcValue = {
+        Clsid: Number.parseInt($("option:selected").val()),
+        Tid: Number.parseInt(localStorage.getItem("Userid")),
+        RollcallType: 1,
+      };
+
+      fetch(Global.url + `/tr/rollcallbf`, {
+        body: JSON.stringify(rcValue),
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "content-type": "application/json",
+        },
+        method: "POST",
+      })
+        .then(async (res) => {
+          const resData = await res.json();
+          $("#rollcallBody").html(`<tr>
+          <th scope="row">${resData.Rcid}</th>
+          <td>${resData.Clsid}</td>
+          <td>${resData.Rollcalltype}</td>
+          <td>${resData.CallIp}</td>
+          <td>${new Date(resData.callTime).toLocaleString('zh-TW')}</td>
+          <td><button type="button" class="btn btn-outline-primary" id="stopCall">暫停點名</button></td>
+          <td><button type="button" class="btn btn-outline-primary" id="reCall">重啟點名</button></td>
+        </tr>`);
+          if (resData.State === 0) {
+            $("#reCall").attr("disabled", false);
+            $("#stopCall").attr("disabled", true);
+          } else {
+            $("#reCall").attr("disabled", true);
+            $("#stopCall").attr("disabled", false);
+          }
+
+          $("#stopCall").on("click", (e) => {
+            fetch(Global.url + `/tr/stopCall/${resData.Rcid}`, {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "content-type": "application/json",
+              },
+              method: "GET",
+            }).then(async (res) => {
+              const response = await res.text();
+              console.log(response);
+              $("#reCall").attr("disabled", false);
+              $("#stopCall").attr("disabled", true);
+            });
+          });
+
+          $("#reCall").on("click", (e) => {
+            fetch(Global.url + `/tr/reCall/${resData.Rcid}`, {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "content-type": "application/json",
+              },
+              method: "GET",
+            }).then(async (res) => {
+              const response = await res.text();
+              console.log(response);
+              $("#reCall").attr("disabled", true);
+              $("#stopCall").attr("disabled", false);
+            });
+          });
+          console.log(resData);
+        })
+        .catch((err) => {
+          alert("Error: 課程ID不能為空");
+        });
+    });
+
+    // 下課點名
+    $("#leftClassCallBtn").on("click", (e) => {
+      $("#rollcallTable").attr("hidden", false);
+      $("#attentanceTable").attr("hidden", true);
+      const rcValue = {
+        Clsid: Number.parseInt($("option:selected").val()),
+        Tid: Number.parseInt(localStorage.getItem("Userid")),
+        RollcallType: 2,
+      };
+
+      fetch(Global.url + `/tr/rollcallbf`, {
+        body: JSON.stringify(rcValue),
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "content-type": "application/json",
+        },
+        method: "POST",
+      })
+        .then(async (res) => {
+          const resData = await res.json();
+          $("#rollcallBody").html(`<tr>
+          <th scope="row">${resData.Rcid}</th>
+          <td>${resData.Clsid}</td>
+          <td>${resData.Rollcalltype}</td>
+          <td>${resData.CallIp}</td>
+          <td>${new Date(resData.callTime).toLocaleString('zh-TW')}</td>
+          <td><button type="button" class="btn btn-outline-primary" id="stopCall">暫停點名</button></td>
+          <td><button type="button" class="btn btn-outline-primary" id="reCall">重啟點名</button></td>
+        </tr>`);
+          if (resData.State === 0) {
+            $("#reCall").attr("disabled", false);
+            $("#stopCall").attr("disabled", true);
+          } else {
+            $("#reCall").attr("disabled", true);
+            $("#stopCall").attr("disabled", false);
+          }
+
+          $("#stopCall").on("click", (e) => {
+            fetch(Global.url + `/tr/stopCall/${resData.Rcid}`, {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "content-type": "application/json",
+              },
+              method: "GET",
+            }).then(async (res) => {
+              const response = await res.text();
+              console.log(response);
+              $("#reCall").attr("disabled", false);
+              $("#stopCall").attr("disabled", true);
+            });
+          });
+
+          $("#reCall").on("click", (e) => {
+            fetch(Global.url + `/tr/reCall/${resData.Rcid}`, {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "content-type": "application/json",
+              },
+              method: "GET",
+            }).then(async (res) => {
+              const response = await res.text();
+              console.log(response);
+              $("#reCall").attr("disabled", true);
+              $("#stopCall").attr("disabled", false);
+            });
+          });
+          console.log(resData);
+        })
+        .catch((err) => {
+          alert("Error: 課程ID不能為空");
+        });
+    });
+
+    // 查詢點名
+    $("#SearchForAttBtn").on("click", (e) => {
+      $("#attentanceTable").attr("hidden", false);
+      $("#rollcallTable").attr("hidden", true);
+      fetch(
+        Global.url +
+          `/tr/attentance?clsid=${Number.parseInt(
+            $("option:selected").val()
+          )}&date=${$("#testDate").val()}`,
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "content-type": "application/json",
+          },
+          method: "GET",
+        }
+      ).then(async (res) => {
+        const response = await res.json();
+        let htmlStr = "";
+        response.forEach((data) => {
+          htmlStr += `<tr>
+            <th scope="row">${data.ClassName}</th>
+            <td style="background-color: ${
+              data.Rcdescription === "上課點名" ? "Aquamarine" : "Bisque"
+            }">${data.Rcdescription}</td>
+            <td>${data.Stuid}</td>
+            <td>${data.Name}</td>
+            <td>${new Date(data.callTime).toGMTString()}</td>
+            <td>${
+              data.responseTime ? new Date(data.responseTime).toLocaleString('zh-TW') : ""
+            }</td>
+            <td>${data.CallIp}</td>
+            <td>${data.CheckIpAddr}</td>
+            <td><p style="color: ${
+              data.Description === "未點名" ? "red" : "black"
+            };">${data.Description}</p></td>
+          </tr>`;
+        });
+
+        $("#attentanceBody").html(htmlStr);
+        console.log(response);
+      });
+    });
+  }
+  rollcall();
+</script>

@@ -1,0 +1,236 @@
+<div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+  <div class="mb-3" style="display:flex; height: 6vh;">
+    <label for="classIdForTr" class="form-label" style="display: inline-block">課程 ID:</label>
+    <input type="text" name="classIdForTr" class="form-control" id="classIdForGrade">
+  </div>
+
+  <div>
+    <button type="button" class="btn btn-outline-primary" id="gradeInputBtn">輸入成績</button>
+    <button type="button" class="btn btn-outline-primary" id="gradeSearchBtn">成績查詢</button>
+    <button type="button" class="btn btn-outline-primary" id="filterValueBtn">過濾查詢</button>
+  </div>
+
+  <br>
+
+  <div class="mb-3 row" style="width: 60%">
+    <label for="testDate" class="col-sm-3 form-label" >考試日期:</label>
+    <div class="col-sm-9">
+      <input type="date" name="testDate" class="form-control" id="testDate">
+    </div>
+  
+    <label for="testType" class="col-sm-3 form-label">考試類型:</label>
+    <div class="col-sm-9">
+      <input type="number" name="testType" class="form-control" id="testType">
+    </div>
+  
+    <label for="testName" class="col-sm-3 form-label">考試名稱:</label>
+    <div class="col-sm-9">
+      <input type="text" name="testName" class="form-control" id="testName" >
+    </div>
+    
+    <button type="button" class="btn btn-outline-primary" id="enterValueBtn" hidden>填入</button>
+  </div>
+</div>
+
+<div id="gradetable">
+  <table class="table table-striped" id="gradetable">
+    <thead>
+      <tr>
+        <th scope="col">學生 ID</th>
+        <th scope="col">學生姓名</th>
+        <th scope="col">考試日期</th>
+        <th scope="col">考試類型</th>
+        <th scope="col">考試名稱</th>
+        <th scope="col">分數</th>
+      </tr>
+    </thead>
+    <tbody id="inputGradeBody">
+    </tbody>
+  </table>
+  <button type="button" class="btn btn-outline-primary" id="submitGradeBtn">提交</button>
+  <button type="button" class="btn btn-outline-primary" id="toCsvBtn">匯出成Excel</button>
+</div>
+
+<script src=
+"//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js">
+</script>
+<script>
+  function grade(){
+    let date = new Date();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    if (month < 10) month = "0" + month;
+    if (day < 10) day = "0" + day;
+    let today = year + "-" + month + "-" + day; 
+    
+    if(localStorage.getItem('classId')){
+      $('#classIdForGrade').val(localStorage.getItem('classId'))
+    }
+    $('#testDate').attr("value", today)
+    $('#testType').attr("value", 1)
+
+    // 前面都是一些預設值得設定
+    // 數入成績BTN====================================================
+    $('#gradeInputBtn').on('click', (e) => {
+      e.preventDefault();
+      $('#testType').attr('disabled', false)
+      $('#testDate').attr('disabled', false)
+      $('#testName').attr('disabled', false)
+
+      const students = fetch(Global.url+`/tr/allstudents/${localStorage.getItem('classId')}`,
+      {headers: {Authorization: 'Bearer '+localStorage.getItem('token')}, method: 'GET'}).then(async(res)=>{
+        const resData = await res.json()
+        // console.log(resData)
+        let innerhtml = ''
+        resData.forEach((stu) => {
+          innerhtml += `<tr id="${stu.Stuid}">
+            <th scope="row">${stu.Stuid}</th>
+            <td>${stu.Name}</td>
+            <td><input type="date" name="testDateTB" class="form-control" id="testDateTB${stu.Stuid}"></td>
+            <td><input type="number" name="testTypeTB" class="form-control" id="testTypeTB${stu.Stuid}"></td>
+            <td><input type="text" name="testNameTB" class="form-control" id="testNameTB${stu.Stuid}"></td>
+            <td><input type="number" name="testGradeTB" class="form-control" id="testGradeTB${stu.Stuid}"></td>
+            <td><input type="button" class="btn btn-outline-primary deleteRow" value="-"></td>
+          </tr>`
+        })
+        innerhtml += '<button type="button" class="btn btn-outline-primary" id="submitgrade">提交</button>'
+        $('#inputGradeBody').html(innerhtml)
+        // 刪除對應的row
+        $('table').on('click', 'input[type="button"]', function(e){
+          $(this).closest('tr').remove()
+      })
+      })
+      $("#enterValueBtn").attr('hidden', false)
+      $("#submitGradeBtn").attr('disabled', false)
+    })
+
+
+    // 填入BTN=======================================================
+    $("#enterValueBtn").click(() => {
+      $("input[name='testDateTB']").each((idx, element) => {
+        // console.log(element)
+        element.value = $("#testDate").val()
+      })
+      $("input[name='testTypeTB']").each((idx, element) => {
+        element.value = $('#testType').val()
+      })
+      $("input[name='testNameTB']").each((idx, element) => {
+        element.value = $('#testName').val()
+      })
+    })
+
+    // 提交分數表單==================================================
+    $("#submitGradeBtn").click(() => {
+      const gradeArr = []
+      let graderecord = {}
+      let grade = {}
+      graderecord.Clsid = $("#classIdForGrade").val();
+      $('tbody#inputGradeBody tr').each((idx, element) => {
+        let grade = {}
+        grade.stuid = element.getElementsByTagName('th')[0].innerText
+        grade.stuName = element.getElementsByTagName('td')[0].innerHTML
+        grade.testScore = element.getElementsByTagName('td')[4].getElementsByTagName('input')[0].value
+        graderecord.TestDate = element.getElementsByTagName('td')[1].getElementsByTagName('input')[0].value
+        graderecord.TestType = element.getElementsByTagName('td')[2].getElementsByTagName('input')[0].value
+        graderecord.TestName = element.getElementsByTagName('td')[3].getElementsByTagName('input')[0].value
+        gradeArr.push(grade)
+      })
+      grade.graderecord = graderecord;
+      grade.stuGrade = gradeArr;
+
+      fetch(Global.url+"/tr/submitGrade", {
+        body: JSON.stringify(grade),
+        headers: {Authorization: 'Bearer '+localStorage.getItem('token'), 'content-type': 'application/json'}, 
+        method: 'POST'}).then(async (res)=>{
+          if(res.status === 200){
+            const text = await res.text();
+            alert(text);
+          }else{
+            alert("資料或Server有誤")
+          }
+        })
+
+      console.log(gradeArr)
+    })
+
+    //成績查詢========================================================
+    $("#gradeSearchBtn").on('click',async (e) => {
+      //$('#testType').attr('disabled', true)
+      //$('#testDate').attr('disabled', true)
+      //$('#testName').attr('disabled', true)
+      const classId = $('#classIdForGrade').val();
+      // console.log(classId)
+      $('td>input').attr('disabled',"disabled")
+      $("#enterValueBtn").attr('hidden', true)
+      $("#submitGradeBtn").attr('disabled', true)
+      fetch(Global.url+`/tr/allGrades/${classId}`, {
+        headers: {Authorization: 'Bearer '+localStorage.getItem('token')},
+        method: 'GET'
+      }).then(async(res)=>{
+        const resData = await res.json();
+
+        let innerhtml = ''
+        resData.forEach((stutest) => {
+          const date = new Date(stutest.TestDate)
+
+          innerhtml += `<tr id="${stutest.Stuid}">
+            <th scope="row">${stutest.Stuid}</th>
+            <td>${stutest.Name}</td>
+            <td>${date.toLocaleDateString()}</td>
+            <td>${stutest.TestType}</td>
+            <td>${stutest.TestName}</td>
+            <td>${stutest.Score}</td>
+          </tr>`
+        })
+        $('#inputGradeBody').html(innerhtml)
+      })
+    })
+
+    //過濾查詢可以用date、Type、name查
+    $('#filterValueBtn').on('click', async(e) => {
+      let filterValue = {}
+      filterValue.clsid = $('#classIdForGrade').val();
+      filterValue.testDate = $("#testDate").val()
+      filterValue.testType = $('#testType').val()
+      filterValue.testName = $('#testName').val()
+      fetch(Global.url+"/tr/allGrades", {
+        body: JSON.stringify(filterValue),
+        headers: {Authorization: 'Bearer '+localStorage.getItem('token'), 'content-type': 'application/json'}, 
+        method: 'POST'}).then(async(res) => {
+          const resData = await res.json();
+          let innerhtml = ''
+          resData.forEach((stutest) => {
+            const date = new Date(stutest.TestDate)
+
+            innerhtml += `<tr id="${stutest.Stuid}">
+              <th scope="row">${stutest.Stuid}</th>
+              <td>${stutest.Name}</td>
+              <td>${date.toLocaleDateString()}</td>
+              <td>${stutest.TestType}</td>
+              <td>${stutest.TestName}</td>
+              <td>${stutest.Score}</td>
+            </tr>`
+          })
+          $('#inputGradeBody').html(innerhtml)
+        })
+    })
+
+    if(localStorage.getItem('from') === 'gradeInput'){
+      document.getElementById('gradeInputBtn').click()
+    }
+    else if(localStorage.getItem('from') === 'gradeQuery'){
+      document.getElementById('gradeSearchBtn').click()
+    }
+
+    $('#toCsvBtn').on('click',() => {
+      const testdate = $('#testDate').val() ? $('#testDate').val():''
+      const testtype = $('#testType').val()!==null ? $('#testType').val():''
+      const testname = $('#testName').val() ? $('#testName').val():''
+      $('#gradetable').table2excel({
+        filename: `${testdate}_${testtype}_${testname}.xls`
+      })
+    })
+  }
+  grade()
+</script>

@@ -1,0 +1,75 @@
+<div class="mb-3" style="display:flex; height: 6vh;">
+  <label for="classIdForStu" class="form-label" style="display: inline-block">課程 ID:</label>
+  <select class="form-select" aria-label="Default select example" id="selectClassStu">
+    <option selected id="classIdForStu">Open this select menu</option>
+  </select>
+</div>
+
+<div class="mb-3 row" style="display:flex; height: 6vh;">
+  <label for="dateCondStu" class="col-sm-4 form-label" >點名日期<span style="color: red">(僅供查詢使用):</span></label>
+  <div class="col-sm-7">
+    <input type="date" name="dateCondStu" class="form-control" id="dateCondStu">
+  </div>
+</div>
+
+<button type="submit" class="btn btn-outline-primary" style="white-space:nowrap;" id="SearchForStuBtn">查詢</button>
+<div>
+  <table id="attentanceTableStu" class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">課程名稱</th>
+        <th scope="col">點名類別</th>
+        <th scope="col">學號</th>
+        <th scope="col">學生姓名</th>
+        <th scope="col">點名時間</th>
+        <th scope="col">回應時間</th>
+        <th scope="col">點名IP</th>
+        <th scope="col">回應IP</th>
+        <th scope="col">點名狀態</th>
+      </tr>
+    </thead>
+    <tbody id="attentanceBodyStu">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  fetch(Global.url+`/stu/studyClasses/${localStorage.getItem('Userid')}`,{
+    headers: {Authorization: 'Bearer '+localStorage.getItem('token')}, 
+    method: 'GET'
+  }).then(async (res) => {
+    const classes = await res.json()
+    console.log(classes)
+    classes.forEach(data => {
+      $('#selectClassStu').append(`<option value=${data.Clsid}>${data.Clsid} ${data.ClassName}</option>`)
+    });
+
+    $('#SearchForStuBtn').on('click', async(e) => {
+      // console.log("click")
+      fetch(Global.url+`/stu/attentance?stuid=${localStorage.getItem('Userid')}&clsid=${Number.parseInt($('option:selected').val())}&date=${$('#dateCondStu').val()}`, 
+      {
+        headers: {Authorization: 'Bearer '+localStorage.getItem('token'), 'content-type': 'application/json'},
+        method: 'GET'
+      }).then(async (res) => {
+        const response = await res.json();
+        let htmlStr = '';
+        response.forEach((data) => {
+          htmlStr+=`<tr>
+            <th scope="row">${data.ClassName}</th>
+            <td style="background-color: ${data.Rcdescription==="上課點名"?"Aquamarine":"Bisque"}">${data.Rcdescription}</td>
+            <td>${data.Stuid}</td>
+            <td>${data.Name}</td>
+            <td>${new Date(data.callTime).toLocaleString('zh-TW')}</td>
+            <td>${data.responseTime ? new Date(data.responseTime).toLocaleString('zh-TW'):''}</td>
+            <td>${data.CallIp}</td>
+            <td>${data.CheckIpAddr}</td>
+            <td><p style="color: ${data.Description==='未點名'?"red":"black"};">${data.Description}</p></td>
+          </tr>`
+        })
+
+        $('#attentanceBodyStu').html(htmlStr)
+      })
+    })
+  })
+
+</script>

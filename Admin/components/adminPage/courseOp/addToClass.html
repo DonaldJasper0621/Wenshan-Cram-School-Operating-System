@@ -1,0 +1,37 @@
+<form class="registerForm" id="addToClassForm">
+  <div class="reminder">
+    <h3>Add To Class</h3>
+    <p class="message" style="color:red"></p>
+  </div>
+  
+  <div class="mb-3">
+    <label for="Clsid" class="form-label">Class ID:</label>
+    <input type="text" name="Clsid" class="form-control" id="Clsid">
+  </div>
+  <div class="mb-3" class="Stuid">
+    <label for="studentId" class="form-label">Student ID:</label>
+    <input type="text" name="Stuid"  class="form-control studentId">
+  </div>
+  <button type="submit" id="addStuBtn" class="btn btn-primary" bg-info>+</button>
+  <button type="submit" id="delStuBtn" class="btn btn-primary" bg-info>-</button>
+  <button type="submit" id="addToClassBtn" class="btn btn-primary" bg-info>Submit</button>
+</form>
+
+<script>
+  $('#addStuBtn').click((e) => {
+    e.preventDefault();
+    console.log("click")
+    $("input.studentId:last-child").after(`<input type="text" style="margin-top: 2%;" name="Stuid" class="form-control studentId">`);
+  })
+  $('#delStuBtn').click((e) => {
+    e.preventDefault();
+    console.log("click")
+    $("input.studentId:last-child").remove();
+  })
+
+  $("#addToClassBtn").on('click',async (e) => {
+    e.preventDefault();
+    const res = await dealForm('POST', Global.url+"/admin/addToClass", 'addToClassForm', true);
+    console.log(res);
+  })
+</script>

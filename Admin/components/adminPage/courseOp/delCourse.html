@@ -1,0 +1,28 @@
+<div class="reminder">
+  <h3>Delete Class</h3>
+  <p class="message" style="color:red"></p>
+</div>
+<br>
+<form class="registerForm" id="delClassForm">
+  <div class="mb-3">
+    <label for="Clsid" class="form-label">Class ID:</label>
+    <input type="text" name="Clsid" class="form-control" id="Clsid">
+  </div>
+  <button type="submit" id="delClassBtn" class="btn btn-primary" bg-info>Submit</button>
+</form>
+
+<script>
+
+  $("#delClassBtn").on('click',async (e) => {
+    e.preventDefault();
+    let clsName = await fetch(Global.url+`/admin/class/${$('#Clsid').val()}`, {method: 'GET', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')}})
+    clsName = await clsName.json()
+    clsName = clsName[0].ClassName
+    console.log(clsName)
+    let check = confirm(`你確定要刪除" ${clsName} "?`)
+    if(check){
+      const res = await dealForm('DELETE', Global.url+"/admin/delClass", 'delClassForm', true);
+      console.log(res);
+    }
+  })
+</script>

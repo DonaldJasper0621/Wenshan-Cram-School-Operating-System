@@ -1,0 +1,81 @@
+$table-color: #2EC4B6;
+$table-striped-color: $table-color;
+$table-bg: #2EC4B6;
+nav{
+  background-color: #2EC4B6;
+}
+
+.topNavLink{
+  justify-content: flex-end;
+  display: border-box;
+}
+
+.loginForm{
+  margin-top: 10vh;;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  form{
+    width: 50%;
+  }
+}
+
+.loginNav{
+  margin-left: 10vw;
+  margin-top: 5vh;
+  font-size: 1.5rem;
+}
+
+.nav-link{
+  &:hover{
+    background-color: white;
+  }
+  margin-right: 1vw;
+  font-weight: 1000;
+  border-bottom: 0.3vh solid rgb(240, 238, 238);
+}
+
+.adminPage{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 2vh;
+  .selectRole{
+    width: 40vw;
+  }
+}
+
+.registerForm{
+  margin-top: 3vh;
+  width: 50vw;
+}
+
+#delUserForm{
+  margin-top: 4vh;
+}
+
+a, button{
+  cursor: pointer;
+}
+
+div.reminder{
+  background-color: #2EC4B6;
+  display: inline-block;
+  border-radius: 1em;
+  padding: 0.5em;
+  h3{
+    color: #F6F7F8
+  }
+}
+
+@media screen and (max-width:900px) {
+  .adminPage{
+    h3{
+      display: none;
+    }
+    .selectRole{
+      width: 100%;
+    }
+  }
+}

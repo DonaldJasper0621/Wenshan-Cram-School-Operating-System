@@ -1,0 +1,98 @@
+nav {
+  background-color: #2EC4B6;
+}
+
+.topNavLink {
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  display: border-box;
+}
+
+.loginForm {
+  margin-top: 10vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.loginForm form {
+  width: 50%;
+}
+
+.loginNav {
+  margin-left: 10vw;
+  margin-top: 5vh;
+  font-size: 1.5rem;
+}
+
+.nav-link {
+  margin-right: 1vw;
+  font-weight: 1000;
+  border-bottom: 0.3vh solid #f0eeee;
+}
+
+.nav-link:hover {
+  background-color: white;
+}
+
+.adminPage {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  margin-top: 2vh;
+}
+
+.adminPage .selectRole {
+  width: 40vw;
+}
+
+.registerForm {
+  margin-top: 3vh;
+  width: 50vw;
+}
+
+#delUserForm {
+  margin-top: 4vh;
+}
+
+a, button {
+  cursor: pointer;
+}
+
+div.reminder {
+  background-color: #2EC4B6;
+  display: inline-block;
+  border-radius: 1em;
+  padding: 0.5em;
+}
+
+div.reminder h3 {
+  color: #F6F7F8;
+}
+
+@media screen and (max-width: 900px) {
+  .adminPage h3 {
+    display: none;
+  }
+  .adminPage .selectRole {
+    width: 100%;
+  }
+}
+/*# sourceMappingURL=index.css.map */

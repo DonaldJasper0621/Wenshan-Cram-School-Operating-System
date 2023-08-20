@@ -1,0 +1,42 @@
+<form class="registerForm" id="addCourseForm">
+  <div class="reminder">
+    <h3>Add Class</h3>
+  </div>
+  
+  <div class="mb-3">
+    <label for="className" class="form-label">Class Name:</label>
+    <input type="text" name="ClassName" class="form-control" id="className">
+  </div>
+  <div class="mb-3">
+    <label for="teacherId" class="form-label">Teacher ID:</label>
+    <input type="text" name="Tid" class="form-control" id="teacherId">
+  </div>
+  <div class="mb-3">
+    <label for="classFee" class="form-label">Fee:</label>
+    <input type="number" name="Fee" class="form-control" id="classFee">
+  </div>
+  <div class="mb-3">
+    <label for="openTime" class="form-label">Open Time:</label>
+    <input type="date" name="OpenTime" class="form-control" id="openTime">
+  </div>
+  <div class="mb-3">
+    <label for="startAt" class="form-label">Start At:</label>
+    <input type="time" name="StartAt" class="form-control" id="startAt">
+  </div>
+  <div class="mb-3">
+    <label for="endAt" class="form-label">End At:</label>
+    <input type="time" name="EndAt" class="form-control" id="endAt">
+  </div>
+  <button type="submit" id="addCourseBtn" class="btn btn-primary" bg-info>Submit</button>
+</form>
+
+<script>
+  $('#addCourseBtn').click((e) => {
+    e.preventDefault();
+    dealForm('POST' ,Global.url+"/admin/addClass", "addCourseForm",true, null, null);
+    $(':input','#addCourseForm').not(':button, :submit, :reset, :hidden')
+      .val('')
+      .prop('checked', false)
+      .prop('selected', false);
+  })
+</script>
