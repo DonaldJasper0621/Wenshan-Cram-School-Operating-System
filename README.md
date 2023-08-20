@@ -8,11 +8,21 @@ Welcome to the official repository for the Wenshan Cram School Operating System 
 
 ## 🚀 Features
 
-- **Dynamic Inventory System**: Accurately track and manage school resources.
-- **Real-time Data Processing**: Instantly process and reflect changes in data across the system.
-- **Responsive UI**: Clean and intuitive user interfaces that adapt seamlessly across devices.
-- **Security**: Built with the latest security standards to ensure data integrity and safety.
+- **Dynamic Ingredient Management**:
+  - Records ordered and leftover ingredients per period, optimizing long-term ingredient ordering.
+  - Enhances ingredient utilization, reducing excesses or shortages.
 
+- **Efficient Pre-Ordering**:
+  - Streamlines customer traffic, minimizing wait times.
+  - Facilitates advance meal preparation, boosting staff work efficiency.
+
+- **Customer Engagement**:
+  - Introduces a review system and satisfaction surveys, enhancing communication with customers.
+  - Addresses the previous challenge of limited customer interaction channels.
+
+- **Feedback-driven Menu Design**:
+  - Collects and analyzes customer reviews to understand preferences.
+  - Uses insights to design future menus, maximizing satisfaction by promoting favored dishes and reducing less preferred ones.
 ---
 
 ## 🛠️ Technologies Used
