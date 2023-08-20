@@ -1,0 +1,167 @@
+CREATE TABLE Admin(
+    Aid int NOT NULL AUTO_INCREMENT,
+	Role int default 0,
+    Name varchar(50) NOT NULL,
+    Account varchar(30) NOT NULL,
+    Pass varchar(30) NOT NULL,
+    Phone varchar(20),
+    UNIQUE	(Account),
+    PRIMARY KEY(Aid)
+);
+
+CREATE TABLE Teacher(
+	Tid int NOT NULL AUTO_INCREMENT,
+    Role int default 1,
+    Account varchar(30) NOT NULL,
+    Pass varchar(30) NOT NULL,
+	Name varchar(50) NOT NULL,
+    Phone varchar(20),
+    Entry DATETIME DEFAULT CURRENT_DATE,
+    Dismiss DATETIME,
+    UNIQUE (Account),
+    PRIMARY KEY(Tid),
+    INDEX accountIndex(Account),
+    INDEX nameIndex(Name)
+);
+
+CREATE TABLE Class(
+	Clsid int NOT NULL AUTO_INCREMENT,
+    ClassName varchar(20),
+    Tid int NOT NULL,
+    OpenTime DATETIME not null,
+    StartAt Time not null,
+    EndAt Time not null,
+    Fee int,
+    Exist boolean DEFAULT 1,
+    PRIMARY KEY(Clsid),
+    FOREIGN KEY(Tid) REFERENCES Teacher(Tid),
+    INDEX nameIndex(ClassName, Tid),
+    INDEX teacherIndex(Tid, ClassName),
+    INDEX timeIndex(StartAt, EndAt)
+);
+
+CREATE TABLE Student(
+	Stuid int NOT NULL AUTO_INCREMENT,
+    Role int DEFAULT 2,
+    Account varchar(30) NOT NULL,
+    Pass varchar(30) NOT NULL,
+	Name varchar(50) NOT NULL,
+    Birthday date,
+    Phone varchar(20),
+    UNIQUE	(Account),
+    PRIMARY KEY(Stuid),
+    INDEX nameIndex(Name),
+    INDEX accountIndex(Account)
+);
+
+CREATE TABLE Parent(
+	Pid int NOT NULL AUTO_INCREMENT,
+    Role int DEFAULT 3,
+    Account varchar(30) NOT NULL,
+    Pass varchar(30) NOT NULL,
+    Name varchar(50) NOT NULL,
+    Stuid int NOT NULL,
+    Phone varchar(20),
+    BlackList BOOLEAN,
+    PRIMARY KEY(Pid),
+    UNIQUE	(Account),
+    FOREIGN KEY(Stuid) REFERENCES Student(Stuid),
+    INDEX nameIndex(Name),
+    INDEX stuIndedx(Stuid)
+);
+
+CREATE TABLE RoleDef(
+	Roleid int not null unique,
+    description varchar(20),
+    PRIMARY KEY(roleid)
+);
+
+CREATE TABLE StudyClass(
+	Stuid int NOT NULL,
+    Clsid int NOT NULL,
+    Exist boolean DEFAULT true,
+    PaidDate DATETIME, 
+    FOREIGN KEY(Stuid) REFERENCES Student(Stuid),
+    FOREIGN KEY(Clsid) REFERENCES Class(Clsid),
+    INDEX clsIndex(Clsid, Stuid),
+    INDEX stuIndex(Stuid, Clsid)
+);
+
+CREATE TABLE RollCall(
+    Rcid int not NULL AUTO_INCREMENT,
+    Rollcalltype int not NULL,
+    Tid int NOT NULL,
+    Clsid int NOT NULL,
+    CallIp varchar(30),
+    callTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    State boolean default 1,
+    PRIMARY KEY(Rcid),
+    FOREIGN KEY(Tid) REFERENCES Teacher(Tid),
+    FOREIGN KEY(Clsid) REFERENCES Class(Clsid)
+);
+
+CREATE TABLE Attentance(
+    Stuid int NOT NULL,
+	Clsid int NOT NULL,
+    Rcid int NOT NULL,
+    CheckIpAddr varchar(30),
+    AttenStatus int,  
+    responseTime DATETIME,
+    FOREIGN KEY(Stuid) REFERENCES Student(Stuid),
+    FOREIGN KEY(Clsid) REFERENCES Class(Clsid),
+    FOREIGN KEY(Rcid) REFERENCES RollCall(Rcid),
+    INDEX classIndex(Clsid, AttenStatus),
+    INDEX statusIndex(AttenStatus),
+    INDEX stuIndex(Stuid),
+    INDEX RcIndex(Rcid)
+);
+
+CREATE TABLE TestRecord(
+    Testid INT NOT NULL unique AUTO_INCREMENT,
+    Clsid int NOT null,
+    TestDate DATE,
+    TestType int,
+    TestName varchar(30),
+    FOREIGN KEY(Clsid) REFERENCES Class(Clsid),
+    PRIMARY KEY (Testid)
+);
+
+CREATE TABLE TestScore(
+	Stuid int NOT null,
+    Testid int NOT null,
+    Score int,
+    FOREIGN KEY(Stuid) REFERENCES student(Stuid),
+    FOREIGN KEY(Testid) REFERENCES TestRecord(Testid),
+    INDEX stuIndex(Stuid),
+    INDEX testIndex(Testid)
+);
+
+CREATE TABLE AttentanceStatus(
+	Statusid int Not NULL unique,
+    Description varchar(30),
+    PRIMARY KEY(statusid)
+);
+
+CREATE TABLE TestType(
+	Typeid int NOT NULL,
+    Description varchar(50),
+    PRIMARY KEY(typeid)
+);
+
+CREATE TABLE RollCallType(
+    Rctid int NOT NULL unique,
+    Description varchar(50),
+    PRIMARY KEY(Rctid)
+);
+
+INSERT INTO attentancestatus(Statusid, Description)
+VALUES(0, "已點名"),(2, "未點名"),(4, "遲到"),(8, "早退");
+
+INSERT INTO rollcalltype(Rctid, Description)
+VALUES(1, "上課點名"),(2, "下課點名");
+
+INSERT INTO roledef(Roleid, description) 
+VALUES(0, "admin"), (1, "teacher"), (2, "student");
+
+INSERT INTO testtype(Typeid, Description) 
+VALUES(1, "小考"), (2, "大考");
