@@ -1,9 +1,8 @@
 # Wenshan Cram School Operating System
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue) ![MIT License](https://img.shields.io/badge/license-MIT-green)
 
-[Demo Video in Chinese](https://www.youtube.com/watch?v=UJ_Pa57Ln88)
 Welcome to the official repository for the Wenshan Cram School Operating System - an innovative solution developed to manage and streamline operations for educational institutions. This system is a perfect blend of cutting-edge frontend and backend technologies to ensure optimal performance and user experience.
-
+[Demo Video in Chinese](https://www.youtube.com/watch?v=UJ_Pa57Ln88)
 ---
 
 ## 🚀 Features
